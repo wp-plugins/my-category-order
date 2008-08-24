@@ -14,7 +14,7 @@ function mycategoryorder_init() {
 function mycategoryorder_menu()
 {   
 	if (function_exists('add_submenu_page'))
-		add_submenu_page("edit.php", 'My Category Order', 'My Category Order', 2,"mycategoryorder",'mycategoryorder');
+		add_submenu_page("edit.php", 'My Category Order', 'My Category Order', 4,"mycategoryorder",'mycategoryorder');
 }
 
 function mycategoryorder_js_libs() {
