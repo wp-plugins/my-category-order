@@ -3,7 +3,7 @@
 Plugin Name: My Category Order
 Plugin URI: http://www.geekyweekly.com/mycategoryorder
 Description: My Category Order allows you to set the order in which categories will appear in the sidebar. Uses a drag and drop interface for ordering. Adds a widget with additional options for easy installation on widgetized themes. Visit the My Category Order page after updating Wordpress to apply essential file patches.
-Version: 2.6.1
+Version: 2.6.2
 Author: froman118
 Author URI: http://www.geekyweekly.com
 Author Email: froman118@gmail.com
@@ -14,7 +14,7 @@ function mycategoryorder_init() {
 function mycategoryorder_menu()
 {   
 	if (function_exists('add_submenu_page'))
-		add_submenu_page("edit.php", 'My Category Order', 'My Category Order', 4,"mycategoryorder",'mycategoryorder');
+		add_submenu_page("edit.php", __('My Category Order','mycategoryorder'), __('My Category Order','mycategoryorder'), 4,"mycategoryorder",'mycategoryorder');
 }
 
 function mycategoryorder_js_libs() {
@@ -29,6 +29,7 @@ function mycategoryorder()
 {
 
 	global $wpdb;
+	
 	$mode = "";
 	$mode = $_GET['mode'];
 	$parentID = 0;
@@ -61,26 +62,28 @@ function mycategoryorder()
 	    }
 ?>
 	<div class='wrap'>
-	<h2>My Category Order</h2>
-	<p>Choose a category from the drop down to order subcategories in that category or order the categories on this level by dragging and dropping them into the desired order.</p>
+	<?php mycategoryorder_check_taxonomy_file(); ?>
+	<h2><?php _e('My Category Order','mycategoryorder'); ?></h2>
+	<p><?php _e('Choose a category from the drop down to order subcategories in that category or order the categories on this level by dragging and dropping them into the desired order.','mycategoryorder'); ?></p>
 
 <?php 
 	    if($parentID != 0)
 	    {
 			$parentsParent = $wpdb->get_row("SELECT parent FROM $wpdb->term_taxonomy WHERE term_id = $parentID ", ARRAY_N);
-			echo "<a href='edit.php?page=mycategoryorder&parentID=$parentsParent[0]'>Return to parent category</a>";
+			echo "<a href='edit.php?page=mycategoryorder&parentID=$parentsParent[0]'>".__('Return to parent category','mycategoryorder')."</a>";
 	    }
 
 	    if($subCatStr != "")
-	    { ?>
-	<h3>Order Subcategories</h3>
+	    { 
+		?>
+	<h3><?php _e('Order Subcategories','mycategoryorder'); ?></h3>
 	<select id="cats" name="cats">
 		<?php echo $subCatStr; ?>
 	</select>
-	&nbsp;<input type="button" name="edit" Value="Order Subcategories" onClick="javascript:goEdit();">
+	&nbsp;<input type="button" name="edit" Value="<?php _e('Order Subcategories','mycategoryorder'); ?>" onClick="javascript:goEdit();">
 <?php }
 	$results=$wpdb->get_results("SELECT * FROM $wpdb->terms t inner join $wpdb->term_taxonomy tt on t.term_id = tt.term_id WHERE taxonomy = 'category' and parent = $parentID ORDER BY term_order ASC"); ?>
-	<h3>Order Categories</h3>
+	<h3><?php _e('Order Categories','mycategoryorder'); ?></h3>
 	    <div id="order" style="width: 500px; margin:10px 10px 10px 0px; padding:10px; border:1px solid #B2B2B2;">
 		<?php foreach($results as $row)
 		{
@@ -88,7 +91,7 @@ function mycategoryorder()
 		}?>
 	</div>
 
-	<input type="button" id="orderButton" Value="Click to Order Categories" onclick="javascript:orderCats();">&nbsp;&nbsp;<strong id="updateText"></strong>
+	<input type="button" id="orderButton" Value="<?php _e('Click to Order Categories','mycategoryorder'); ?>" onclick="javascript:orderCats();">&nbsp;&nbsp;<strong id="updateText"></strong>
 
 <?php
 	}
@@ -111,7 +114,7 @@ function mycategoryorder()
 		function orderCats() {
 	
 			$("orderButton").style.display = "none";
-			$("updateText").innerHTML = "Updating Category Order...";
+			$("updateText").innerHTML = "<?php _e('Updating Category Order...','mycategoryorder'); ?>";
 			var alerttext = '';
 			var order = Sortable.serialize('order');
 			alerttext = Sortable.sequence('order');
@@ -120,7 +123,7 @@ function mycategoryorder()
 			onSuccess: function(){
 				new Effect.Highlight('order', {startcolor:'#F9FC4A', endcolor:'#CFEBF7',restorecolor:'#CFEBF7', duration: 1.5, queue: 'front'})
 				new Effect.Highlight('order', {startcolor:'#CFEBF7', endcolor:'#ffffff',restorecolor:'#ffffff', duration: 1.5, queue: 'end'})
-				$("updateText").innerHTML = "Categories updated successfully.";
+				$("updateText").innerHTML = "<?php _e('Categories updated successfully.','mycategoryorder'); ?>";
 	
 				$("orderButton").style.display = "inline";
 			}
@@ -272,9 +275,12 @@ function mycategoryorder()
     }
 }
 
-$class['classname'] = 'widget_categories';
-wp_register_sidebar_widget('mycategoryorder', 'My Category Order', 'wp_widget_mycategoryorder', $class);
-wp_register_widget_control('mycategoryorder', 'My Category Order', 'wp_widget_mycategoryorder_control', $options);
+//$class['classname'] = 'widget_categories';
+mycategoryorder_loadtranslation();
+$description = __( 'Set the order in which categories will appear in the sidebar','mycategoryorder' );
+$widget_ops = array('classname' => 'widget_categories', 'description' => $description );
+wp_register_sidebar_widget('mycategoryorder', __('My Category Order','mycategoryorder'), 'wp_widget_mycategoryorder', $widget_ops);
+wp_register_widget_control('mycategoryorder', __('My Category Order','mycategoryorder'), 'wp_widget_mycategoryorder_control', $options);
 
 }
 
@@ -318,7 +324,7 @@ function mycategoryorder_check_taxonomy_file() {
 		else { // Or throw a message to the user
 			$message  = __('The file', 'mycategoryorder').'&nbsp;<b>'.$fullfilename.'</b>&nbsp;'. __('is not writable', 'mycategoryorder').'.<br/>';
 			$message .= __('You have 2 options', 'mycategoryorder').':<br/>';
-			$message .= '1. '.__('Change the permissions on the file and click on My Link Order again to patch it automatically', 'mycategoryorder').'.<br/>';
+			$message .= '1. '.__('Change the permissions on the file and click on My Category Order again to patch it automatically', 'mycategoryorder').'.<br/>';
 			$message .= '2. '.__('Modify the file manually', 'mycategoryorder').' :<br/>';
 			$message .= __('After line number', 'mycategoryorder').'&nbsp;<b>'.$line_number.'</b> :<br/>';
 			$message .= '<code>'.str_replace('else','',$searched_line).'</code><br/>';
