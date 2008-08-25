@@ -16,14 +16,12 @@ and drop interface for ordering. Adds a widget with additional options for easy 
 = Change Log =
 
 2.6.1a:
-
 * The plugin has been modified to be fully translated
 * The plugin patch no correctly patches taxonomy.php
 * New translation added : French, by Brahim Machkouri (http://www.category-icons.com)
 * The widget has now a description
 
 2.6.1:
-
 * Finally no more taxonomy.php overwriting, well kind of. After you upgrade Wordpress visit the My Category Order page and it will perform the edit automatically.
 * Thanks to Submarine at http://www.category-icons.com for the code.
 * Also added string localization, email me if you are interested in translating.
