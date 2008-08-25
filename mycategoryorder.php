@@ -275,7 +275,6 @@ function mycategoryorder()
     }
 }
 
-//$class['classname'] = 'widget_categories';
 mycategoryorder_loadtranslation();
 $description = __( 'Set the order in which categories will appear in the sidebar','mycategoryorder' );
 $widget_ops = array('classname' => 'widget_categories', 'description' => $description );
@@ -285,7 +284,6 @@ wp_register_widget_control('mycategoryorder', __('My Category Order','mycategory
 }
 
 add_action('plugins_loaded', 'mycategoryorder_init');
-add_action('init', 'mycategoryorder_loadtranslation');
 
 function mycategoryorder_loadtranslation() {
 	load_plugin_textdomain('mycategoryorder', PLUGINDIR.'/'.dirname(plugin_basename(__FILE__)), dirname(plugin_basename(__FILE__)));
