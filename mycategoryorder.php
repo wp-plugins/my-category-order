@@ -3,7 +3,7 @@
 Plugin Name: My Category Order
 Plugin URI: http://www.geekyweekly.com/mycategoryorder
 Description: My Category Order allows you to set the order in which categories will appear in the sidebar. Uses a drag and drop interface for ordering. Adds a widget with additional options for easy installation on widgetized themes. Visit the My Category Order page after updating Wordpress to apply essential file patches.
-Version: 2.6.1a
+Version: 2.7
 Author: froman118
 Author URI: http://www.geekyweekly.com
 Author Email: froman118@gmail.com
@@ -14,12 +14,23 @@ function mycategoryorder_init() {
 function mycategoryorder_menu()
 {   
 	if (function_exists('add_submenu_page'))
-		add_submenu_page("edit.php", __('My Category Order','mycategoryorder'), __('My Category Order','mycategoryorder'), 4,"mycategoryorder",'mycategoryorder');
+		add_submenu_page(mycategoryorder_getTarget(), __('My Category Order','mycategoryorder'), __('My Category Order','mycategoryorder'), 4,"mycategoryorder",'mycategoryorder');
 }
 
 function mycategoryorder_js_libs() {
 	if ( $_GET['page'] == "mycategoryorder" )
-		wp_enqueue_script('scriptaculous');
+		wp_enqueue_script('jquery');
+		wp_enqueue_script('jquery-ui-core');
+		wp_enqueue_script('jquery-ui-sortable');
+}
+
+//Switch page target depending on version
+function mycategoryorder_getTarget() {
+	global $wp_version;
+	if (version_compare($wp_version, '2.6.5', '>'))
+		return "post-new.php";
+	else
+		return "edit.php";
 }
 
 add_action('admin_menu', 'mycategoryorder_menu');
@@ -27,12 +38,12 @@ add_action('admin_menu', 'mycategoryorder_js_libs');
 
 function mycategoryorder()
 {
-
 	global $wpdb;
 	
 	$mode = "";
 	$mode = $_GET['mode'];
 	$parentID = 0;
+	$success = "";
 	if (isset($_GET['parentID']))
 	    $parentID = $_GET['parentID'];
 
@@ -43,39 +54,41 @@ function mycategoryorder()
 	}
 
 	if($mode == "act_OrderCategories")
-	{  $idString = $_GET['idString'];
-	$catIDs = explode(",", $idString);
-	$result = count($catIDs);
-	for($i = 0; $i < $result; $i++)
-	{	
-	    $wpdb->query("UPDATE $wpdb->terms SET term_order = '$i' WHERE term_id ='$catIDs[$i]'");
+	{  
+		$idString = $_GET['idString'];
+		$catIDs = explode(",", $idString);
+		$result = count($catIDs);
+		for($i = 0; $i < $result; $i++)
+		{	
+			$wpdb->query("UPDATE $wpdb->terms SET term_order = '$i' WHERE term_id ='$catIDs[$i]'");
+		}
+		$success = '<div id="message" class="updated fade"><p>'. __('Categories updated successfully.', 'mycategoryorder').'</p></div>';
 	}
-	}
-	else
-	{
-	    $subCatStr = "";
 
-		$results=$wpdb->get_results("SELECT t.term_id, t.name FROM $wpdb->term_taxonomy tt, $wpdb->terms t, $wpdb->term_taxonomy tt2 WHERE tt.parent = $parentID AND tt.taxonomy = 'category' AND t.term_id = tt.term_id AND tt2.parent = tt.term_id GROUP BY t.term_id, t.name HAVING COUNT(*) > 0 ORDER BY t.term_order ASC");
-	    foreach($results as $row)
-	    {
-			$subCatStr = $subCatStr."<option value='$row->term_id'>$row->name</option>";
-	    }
+	$subCatStr = "";
+
+	$results=$wpdb->get_results("SELECT t.term_id, t.name FROM $wpdb->term_taxonomy tt, $wpdb->terms t, $wpdb->term_taxonomy tt2 WHERE tt.parent = $parentID AND tt.taxonomy = 'category' AND t.term_id = tt.term_id AND tt2.parent = tt.term_id GROUP BY t.term_id, t.name HAVING COUNT(*) > 0 ORDER BY t.term_order ASC");
+	foreach($results as $row)
+	{
+		$subCatStr = $subCatStr."<option value='$row->term_id'>$row->name</option>";
+	}
 ?>
 	<div class='wrap'>
+	<?php echo $success; ?>
 	<?php mycategoryorder_check_taxonomy_file(); ?>
 	<h2><?php _e('My Category Order','mycategoryorder'); ?></h2>
 	<p><?php _e('Choose a category from the drop down to order subcategories in that category or order the categories on this level by dragging and dropping them into the desired order.','mycategoryorder'); ?></p>
 
 <?php 
-	    if($parentID != 0)
-	    {
-			$parentsParent = $wpdb->get_row("SELECT parent FROM $wpdb->term_taxonomy WHERE term_id = $parentID ", ARRAY_N);
-			echo "<a href='edit.php?page=mycategoryorder&parentID=$parentsParent[0]'>".__('Return to parent category','mycategoryorder')."</a>";
-	    }
+	if($parentID != 0)
+	{
+		$parentsParent = $wpdb->get_row("SELECT parent FROM $wpdb->term_taxonomy WHERE term_id = $parentID ", ARRAY_N);
+		echo "<a href='". mycategoryorder_getTarget() . "?page=mycategoryorder&parentID=$parentsParent[0]'>".__('Return to parent category','mycategoryorder')."</a>";
+	}
 
-	    if($subCatStr != "")
-	    { 
-		?>
+	if($subCatStr != "")
+	{ 
+	?>
 	<h3><?php _e('Order Subcategories','mycategoryorder'); ?></h3>
 	<select id="cats" name="cats">
 		<?php echo $subCatStr; ?>
@@ -84,58 +97,48 @@ function mycategoryorder()
 <?php }
 	$results=$wpdb->get_results("SELECT * FROM $wpdb->terms t inner join $wpdb->term_taxonomy tt on t.term_id = tt.term_id WHERE taxonomy = 'category' and parent = $parentID ORDER BY term_order ASC"); ?>
 	<h3><?php _e('Order Categories','mycategoryorder'); ?></h3>
-	    <div id="order" style="width: 500px; margin:10px 10px 10px 0px; padding:10px; border:1px solid #B2B2B2;">
+	    <ul id="order" style="width: 500px; margin:10px 10px 10px 0px; padding:10px; border:1px solid #B2B2B2; list-style:none;">
 		<?php foreach($results as $row)
 		{
-			echo "<div id='item_$row->term_id' class='lineitem'>$row->name</div>";
+			echo "<li id='$row->term_id' class='lineitem'>$row->name</li>";
 		}?>
-	</div>
+	</ul>
 
 	<input type="button" id="orderButton" Value="<?php _e('Click to Order Categories','mycategoryorder'); ?>" onclick="javascript:orderCats();">&nbsp;&nbsp;<strong id="updateText"></strong>
 
-<?php
-	}
-?>
 </div>
 
 <style>
-	div.lineitem {
+	li.lineitem {
 		margin: 3px 0px;
 		padding: 2px 5px 2px 5px;
 		background-color: #F1F1F1;
 		border:1px solid #B2B2B2;
 		cursor: move;
+		width: 490px;
 	}
 </style>
 
-	<script language="JavaScript">
-		Sortable.create('order',{tag:'div'});
-	
-		function orderCats() {
-	
-			$("orderButton").style.display = "none";
-			$("updateText").innerHTML = "<?php _e('Updating Category Order...','mycategoryorder'); ?>";
-			var alerttext = '';
-			var order = Sortable.serialize('order');
-			alerttext = Sortable.sequence('order');
-	
-			new Ajax.Request('edit.php?page=mycategoryorder&mode=act_OrderCategories&idString='+alerttext, {
-			onSuccess: function(){
-				new Effect.Highlight('order', {startcolor:'#F9FC4A', endcolor:'#CFEBF7',restorecolor:'#CFEBF7', duration: 1.5, queue: 'front'})
-				new Effect.Highlight('order', {startcolor:'#CFEBF7', endcolor:'#ffffff',restorecolor:'#ffffff', duration: 1.5, queue: 'end'})
-				$("updateText").innerHTML = "<?php _e('Categories updated successfully.','mycategoryorder'); ?>";
-	
-				$("orderButton").style.display = "inline";
-			}
-			});
-			return false;
-		}
-		function goEdit ()
-		{
-			if($("cats").value != "")
-			location.href="edit.php?page=mycategoryorder&mode=dsp_OrderCategories&parentID="+$("cats").value;
-		}
-	</script>
+<script language="JavaScript">
+	jQuery("#order").sortable({ 
+		placeholder: "ui-selected", 
+		revert: false,
+		tolerance: "pointer" 
+	});
+
+	function orderCats() {
+		jQuery("#orderButton").css("display", "none");
+		jQuery("#updateText").html("<?php _e('Updating Category Order...','mycategoryorder'); ?>");
+		
+		idList = jQuery("#order").sortable("toArray");
+		location.href = '<?php echo mycategoryorder_getTarget(); ?>?page=mycategoryorder&mode=act_OrderCategories&parentID=<?php echo $parentID; ?>&idString='+idList;
+	}
+	function goEdit ()
+	{
+		if(jQuery("#cats").val() != "")
+			location.href="<?php echo mycategoryorder_getTarget(); ?>?page=mycategoryorder&parentID="+jQuery("#cats").val();
+	}
+</script>
 
 <?php
     }
@@ -229,45 +232,45 @@ function mycategoryorder()
 		$mco_include = attribute_escape($options['include']);
 		?>
 		<p>
-			<label for="mco_title"><?php _e('Title:'); ?></label> 
+			<label for="mco_title"><?php _e('Title:','mycategoryorder'); ?></label> 
 			<input style="width: 200px;" id="mco_title" name="mco_title" type="text" value="<?php echo $mco_title; ?>" />
 		</p>
 		<p>
 			<input class="checkbox" type="checkbox" <?php echo $mco_dropdown; ?> id="mco_dropdown" name="mco_dropdown" />
-			<label for="mco_dropdown"><?php _e('Show as Drop Down'); ?></label> 
+			<label for="mco_dropdown"><?php _e('Show as Drop Down','mycategoryorder'); ?></label> 
 		</p>
 		<p>
 			<input class="checkbox" type="checkbox" <?php echo $mco_count; ?> id="mco_count" name="mco_count" />
-			<label for="mco_count"><?php _e('Show Post Counts'); ?></label> 
+			<label for="mco_count"><?php _e('Show Post Counts','mycategoryorder'); ?></label> 
 		</p>
 		<p>
 			<input class="checkbox" type="checkbox" <?php echo $mco_hierarchical; ?> id="mco_hierarchical" name="mco_hierarchical" />
-			<label for="mco_hierarchical"><?php _e('Show Hierarchy'); ?></label> 
+			<label for="mco_hierarchical"><?php _e('Show Hierarchy','mycategoryorder'); ?></label> 
 		</p>
 		<p>
 			<input class="checkbox" type="checkbox" <?php echo $mco_update; ?> id="mco_update" name="mco_update" />
-			<label for="mco_update"><?php _e('Show Update Date'); ?></label> 
+			<label for="mco_update"><?php _e('Show Update Date','mycategoryorder'); ?></label> 
 		</p>
 		<p>
 			<input class="checkbox" type="checkbox" <?php echo $mco_empty; ?> id="mco_empty" name="mco_empty" />
-			<label for="mco_empty"><?php _e('Show Empty'); ?></label> 
+			<label for="mco_empty"><?php _e('Show Empty','mycategoryorder'); ?></label> 
 		</p>
 		<p>
-			<label for="mco_feedtext"><?php _e('Feed Text:'); ?></label> 
+			<label for="mco_feedtext"><?php _e('Feed Text:','mycategoryorder'); ?></label> 
 			<input style="width: 200px;" id="mco_feedtext" name="mco_feedtext" type="text" value="<?php echo $mco_feedtext; ?>" />
 		</p>
 		<p>
-			<label for="mco_feedimage"><?php _e('Feed Image URL:'); ?></label> 
+			<label for="mco_feedimage"><?php _e('Feed Image URL:','mycategoryorder'); ?></label> 
 			<input style="width: 200px;" id="mco_feedimage" name="mco_feedimage" type="text" value="<?php echo $mco_feedimage; ?>" />
 			<br />
 			<?php _e('Example: copy this icon icon,'); ?> <img src="<?php bloginfo('url'); ?>/wp-includes/images/rss.png" alt="RSS" />
 		</p>
 		<p>
-			<label for="mco_exclude"><?php _e('Exclude:'); ?></label> 
+			<label for="mco_exclude"><?php _e('Exclude:','mycategoryorder'); ?></label> 
 			<input style="width: 200px;" id="mco_exclude" name="mco_exclude" type="text" value="<?php echo $mco_exclude; ?>" />
 		</p>
 		<p>
-			<label for="mco_include"><?php _e('Include:'); ?></label> 
+			<label for="mco_include"><?php _e('Include:','mycategoryorder'); ?></label> 
 			<input style="width: 200px;" id="mco_include" name="mco_include" type="text" value="<?php echo $mco_include; ?>" />
 		</p>
 		<input type="hidden" id="mco_submit" name="mco_submit" value="1" />
