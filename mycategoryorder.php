@@ -46,10 +46,12 @@ function mycategoryorder()
 	$success = "";
 	if (isset($_GET['parentID']))
 	    $parentID = $_GET['parentID'];
+		
+	$wpdb->show_errors();
 
-	$query = mysql_query("SHOW COLUMNS FROM $wpdb->terms LIKE 'term_order'") or die(mysql_error());
+	$query1 = $wpdb->query("SHOW COLUMNS FROM $wpdb->terms LIKE 'term_order'");
 	
-	if (mysql_num_rows($query) == 0) {
+	if ($query1 == 0) {
 		$wpdb->query("ALTER TABLE $wpdb->terms ADD `term_order` INT( 4 ) NULL DEFAULT '0'");
 	}
 

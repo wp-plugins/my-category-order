@@ -3,8 +3,8 @@ Contributors: froman118
 Donate link: http://geekyweekly.com/mycategoryorder
 Tags: categories, category, order, sidebar, widget
 Requires at least: 2.5
-Tested up to: 2.7
-Stable tag: 2.7
+Tested up to: 2.7.1
+Stable tag: 2.7.1
 
 My Category Order allows you to set the order in which categories will appear in the sidebar.
 
@@ -14,6 +14,12 @@ My Category Order allows you to set the order in which categories will appear in
 and drop interface for ordering. Adds a widget with additional options for easy installation on widgetized themes.
 
 = Change Log =
+
+2.7.1:
+
+* If your categories don't show up for ordering your DB user account must have ALTER permissions, the plugin adds columns to store the order
+* Added a call to $wpdb->show_errors(); to help debug any issues
+* Translations added and thanks: Spanish (Karin), German (Wolfgang and Mike), Swedish (Mans), Italian (Stefano)
 
 2.7:
 
