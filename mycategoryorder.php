@@ -3,7 +3,7 @@
 Plugin Name: My Category Order
 Plugin URI: http://www.geekyweekly.com/mycategoryorder
 Description: My Category Order allows you to set the order in which categories will appear in the sidebar. Uses a drag and drop interface for ordering. Adds a widget with additional options for easy installation on widgetized themes. Visit the My Category Order page after updating Wordpress to apply essential file patches.
-Version: 2.7.1
+Version: 2.8
 Author: froman118
 Author URI: http://www.geekyweekly.com
 Author Email: froman118@gmail.com
@@ -122,10 +122,12 @@ function mycategoryorder()
 </style>
 
 <script language="JavaScript">
-	jQuery("#order").sortable({ 
-		placeholder: "ui-selected", 
-		revert: false,
-		tolerance: "pointer" 
+	jQuery(document).ready(function(){
+		jQuery("#order").sortable({ 
+			placeholder: "ui-selected", 
+			revert: false,
+			tolerance: "pointer" 
+		});
 	});
 
 	function orderCats() {
@@ -302,12 +304,26 @@ function mycategoryorder_check_taxonomy_file() {
 	$error = 0;
 	$string = file_get_contents($fullfilename);
 	$line_number = 0;
-	$searched_line = '$orderby = \'t.term_group\';'."\n\t".'else'."\n";
+	
 	$position = 0;
-	$replace = '$orderby = \'t.term_group\';
-	else if ( \'order\' == $orderby )
-		$orderby = \'t.term_order\';'."\n\t".'else'."\n";
+	
+	global $wp_version;
 
+	if (version_compare($wp_version, '2.7.2', '>'))
+	{
+		$searched_line = 'elseif ( empty($_orderby) || \'id\' == $_orderby ) ';
+		$replace = 'else if ( \'order\' == $_orderby )
+			$orderby = \'t.term_order\';'."\n".
+			'elseif ( empty($_orderby) || \'id\' == $_orderby ) ';
+	}
+	else
+	{
+		$searched_line = '$orderby = \'t.term_group\';'."\n\t".'else'."\n";
+		$replace = '$orderby = \'t.term_group\';
+			else if ( \'order\' == $orderby )
+			$orderby = \'t.term_order\';'."\n\t".'else'."\n";
+	}
+	
 	// Search
 	if (strpos($string,'t.term_order')===false) {
 		$position = strpos($string, $searched_line);
