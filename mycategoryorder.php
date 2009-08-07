@@ -3,7 +3,7 @@
 Plugin Name: My Category Order
 Plugin URI: http://www.geekyweekly.com/mycategoryorder
 Description: My Category Order allows you to set the order in which categories will appear in the sidebar. Uses a drag and drop interface for ordering. Adds a widget with additional options for easy installation on widgetized themes. Visit the My Category Order page after updating Wordpress to apply essential file patches.
-Version: 2.8
+Version: 2.8.3
 Author: froman118
 Author URI: http://www.geekyweekly.com
 Author Email: froman118@gmail.com
@@ -19,9 +19,11 @@ function mycategoryorder_menu()
 
 function mycategoryorder_js_libs() {
 	if ( $_GET['page'] == "mycategoryorder" )
+	{	
 		wp_enqueue_script('jquery');
 		wp_enqueue_script('jquery-ui-core');
 		wp_enqueue_script('jquery-ui-sortable');
+	}
 }
 
 //Switch page target depending on version
@@ -122,13 +124,16 @@ function mycategoryorder()
 </style>
 
 <script language="JavaScript">
-	jQuery(document).ready(function(){
+	
+	function mycategoryrderaddloadevent(){
 		jQuery("#order").sortable({ 
 			placeholder: "ui-selected", 
 			revert: false,
 			tolerance: "pointer" 
 		});
-	});
+	};
+
+	addLoadEvent(mycategoryrderaddloadevent);
 
 	function orderCats() {
 		jQuery("#orderButton").css("display", "none");
@@ -267,7 +272,7 @@ function mycategoryorder()
 			<label for="mco_feedimage"><?php _e('Feed Image URL:','mycategoryorder'); ?></label> 
 			<input style="width: 200px;" id="mco_feedimage" name="mco_feedimage" type="text" value="<?php echo $mco_feedimage; ?>" />
 			<br />
-			<?php _e('Example: copy this icon icon,'); ?> <img src="<?php bloginfo('url'); ?>/wp-includes/images/rss.png" alt="RSS" />
+			<?php _e('Example: copy this icon,','mycategoryorder'); ?> <img src="<?php bloginfo('url'); ?>/wp-includes/images/rss.png" alt="RSS" />
 		</p>
 		<p>
 			<label for="mco_exclude"><?php _e('Exclude:','mycategoryorder'); ?></label> 
