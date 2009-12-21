@@ -23,7 +23,7 @@ As of version 2.8.6 of the plugin I'm breaking backwards compatibility to add ne
 
 = 2.8.7 =
 * Widget and translation bug fixes
-
+* Added Portuguese translation, thanks Tiago
 = 2.8.6 =
 * Significant backend changes, only compatible with 2.8 and above
 * Transitioned to new Widget API, breaking backwards compatibility in the process
