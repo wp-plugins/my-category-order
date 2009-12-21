@@ -3,8 +3,8 @@ Contributors: froman118
 Donate link: http://geekyweekly.com/gifts-and-donations
 Tags: categories, category, order, sidebar, widget
 Requires at least: 2.8
-Tested up to: 2.8.6
-Stable tag: 2.8.6
+Tested up to: 2.9
+Stable tag: 2.8.7
 
 My Category Order allows you to set the order in which categories will appear in the sidebar.
 
@@ -20,6 +20,9 @@ My Category Order has been out since WP 1.5 or 2.0 (2006) and it's been a strugg
 As of version 2.8.6 of the plugin I'm breaking backwards compatibility to add new features like a multiple widget instances. Keep using version [2.8.3](http://downloads.wordpress.org/plugin/my-category-order.2.8.3.zip) if you are not on WP 2.8 yet.
 
 == Change Log ==
+
+= 2.8.7 =
+* Widget and translation bug fixes
 
 = 2.8.6 =
 * Significant backend changes, only compatible with 2.8 and above

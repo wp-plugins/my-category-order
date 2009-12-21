@@ -3,7 +3,7 @@
 Plugin Name: My Category Order
 Plugin URI: http://www.geekyweekly.com/mycategoryorder
 Description: My Category Order allows you to set the order in which categories will appear in the sidebar. Uses a drag and drop interface for ordering. Adds a widget with additional options for easy installation on widgetized themes.
-Version: 2.8.6
+Version: 2.8.7
 Author: Andrew Charlton
 Author URI: http://www.geekyweekly.com
 Author Email: froman118@gmail.com
@@ -207,11 +207,11 @@ class mycategoryorder_Widget extends WP_Widget {
 		$title_li = apply_filters('widget_title', empty( $instance['title_li'] ) ? __( 'Categories' ) : $instance['title_li']);
 		$orderby = empty( $instance['orderby'] ) ? 'order' : $instance['orderby'];
 		$order = empty( $instance['order'] ) ? 'asc' : $instance['order'];
-		$show_dropdown = empty( $instance['show_dropdown'] ) ? '0' : $instance['show_dropdown'];
-		$show_last_updated = empty( $instance['show_last_updated'] ) ? '0' : $instance['show_last_updated'];
-		$show_count = empty( $instance['show_count'] ) ? '0' : $instance['show_count'];
-		$hide_empty = empty( $instance['hide_empty'] ) ? '1' : '0';
-		$use_desc_for_title = empty( $instance['use_desc_for_title'] ) ? '0' : $instance['use_desc_for_title'];
+		$show_dropdown = (bool) $instance['show_dropdown'];
+		$show_last_updated = (bool) $instance['show_last_updated'];
+		$show_count = (bool) $instance['show_count'];
+		$hide_empty = (bool) $instance['hide_empty'];
+		$use_desc_for_title = (bool) $instance['use_desc_for_title'];
 		$child_of = empty( $instance['child_of'] ) ? '' : $instance['child_of'];
 		$feed = empty( $instance['feed'] ) ? '' : $instance['feed'];
 		$feed_image = empty( $instance['feed_image'] ) ? '' : $instance['feed_image'];
@@ -299,7 +299,7 @@ class mycategoryorder_Widget extends WP_Widget {
 	
 	function form( $instance ) {
 		//Defaults
-		$instance = wp_parse_args( (array) $instance, array( 'orderby' => 'order', 'order' => 'asc', 'title_li' => '', 'show_dropdown' => '', 'show_last_updated' => '', 'show_count' => '', 'hide_empty' => '1', 'use_desc_for_title' => '', 'child_of' => '', 'feed' => '', 'feed_image' => '', 'exclude' => '', 'exclude_tree' => '', 'include' => '', 'hierarchical' => '1', 'number' => '', 'depth' => '' ) );
+		$instance = wp_parse_args( (array) $instance, array( 'orderby' => 'order', 'order' => 'asc', 'title_li' => '', 'show_dropdown' => '', 'show_last_updated' => '', 'show_count' => '', 'hide_empty' => '1', 'use_desc_for_title' => '1', 'child_of' => '', 'feed' => '', 'feed_image' => '', 'exclude' => '', 'exclude_tree' => '', 'include' => '', 'hierarchical' => '1', 'number' => '', 'depth' => '' ) );
 		
 		$orderby = esc_attr( $instance['orderby'] );
 		$order = esc_attr( $instance['order'] );
@@ -349,55 +349,55 @@ class mycategoryorder_Widget extends WP_Widget {
 		<p>
 			<label for="<?php echo $this->get_field_id('exclude'); ?>"><?php _e( 'Exclude:', 'mycategoryorder' ); ?></label> <input type="text" value="<?php echo $exclude; ?>" name="<?php echo $this->get_field_name('exclude'); ?>" id="<?php echo $this->get_field_id('exclude'); ?>" class="widefat" />
 			<br />
-			<small><?php _e( 'Category IDs, separated by commas.' ); ?></small>
+			<small><?php _e( 'Category IDs, separated by commas.', 'mycategoryorder'  ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('exclude_tree'); ?>"><?php _e( 'Exclude Tree:', 'mycategoryorder' ); ?></label> <input type="text" value="<?php echo $exclude_tree; ?>" name="<?php echo $this->get_field_name('exclude_tree'); ?>" id="<?php echo $this->get_field_id('exclude_tree'); ?>" class="widefat" />
 			<br />
-			<small><?php _e( 'Category IDs, separated by commas.' ); ?></small>
+			<small><?php _e( 'Category IDs, separated by commas.', 'mycategoryorder'  ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('include'); ?>"><?php _e( 'Include:', 'mycategoryorder' ); ?></label> <input type="text" value="<?php echo $include; ?>" name="<?php echo $this->get_field_name('include'); ?>" id="<?php echo $this->get_field_id('include'); ?>" class="widefat" />
 			<br />
-			<small><?php _e( 'Category IDs, separated by commas.' ); ?></small>
+			<small><?php _e( 'Category IDs, separated by commas.', 'mycategoryorder'  ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('child_of'); ?>"><?php _e( 'Child Of:', 'mycategoryorder' ); ?></label> <input type="text" value="<?php echo $child_of; ?>" name="<?php echo $this->get_field_name('child_of'); ?>" id="<?php echo $this->get_field_id('child_of'); ?>" class="widefat" />
 			<br />
-			<small><?php _e( 'Only display children of this Category ID.' ); ?></small>
+			<small><?php _e( 'Only display children of this Category ID.', 'mycategoryorder'  ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('feed'); ?>"><?php _e( 'Feed Text:', 'mycategoryorder' ); ?></label> <input type="text" value="<?php echo $feed; ?>" name="<?php echo $this->get_field_name('feed'); ?>" id="<?php echo $this->get_field_id('feed'); ?>" class="widefat" />
 			<br />
-			<small><?php _e( 'Text for RSS Feed' ); ?></small>
+			<small><?php _e( 'Text for RSS Feed', 'mycategoryorder'  ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('feed_image'); ?>"><?php _e( 'Feed Image:', 'mycategoryorder' ); ?></label> <input type="text" value="<?php echo $feed_image; ?>" name="<?php echo $this->get_field_name('feed_image'); ?>" id="<?php echo $this->get_field_id('feed_image'); ?>" class="widefat" />
 			<br />
-			<small><?php _e( 'URL to RSS Image, copy url of this image' ); ?></small><img src="<?php bloginfo('url'); ?>/wp-includes/images/rss.png" alt="RSS" />
+			<small><?php _e( 'URL to RSS Image, copy url of this image', 'mycategoryorder'  ); ?></small><img src="<?php bloginfo('url'); ?>/wp-includes/images/rss.png" alt="RSS" />
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('number'); ?>"><?php _e( 'Number to Display:', 'mycategoryorder' ); ?></label> <input type="text" value="<?php echo $number; ?>" name="<?php echo $this->get_field_name('number'); ?>" id="<?php echo $this->get_field_id('number'); ?>" class="widefat" />
 			<br />
-			<small><?php _e( 'Max number of categories to display' ); ?></small>
+			<small><?php _e( 'Max number of categories to display', 'mycategoryorder'  ); ?></small>
 		</p>
 		<p>
 			<label for="<?php echo $this->get_field_id('depth'); ?>"><?php _e( 'Depth:', 'mycategoryorder' ); ?></label> <input type="text" value="<?php echo $depth; ?>" name="<?php echo $this->get_field_name('depth'); ?>" id="<?php echo $this->get_field_id('depth'); ?>" class="widefat" />
 			<br />
-			<small><?php _e( '0 = All, -1 = Flat, 1 = Top Level Only, n = display n levels' ); ?></small>
+			<small><?php _e( '0 = All, -1 = Flat, 1 = Top Level Only, n = display n levels', 'mycategoryorder'  ); ?></small>
 		</p>
 		<p>
-			<input class="checkbox" type="checkbox" <?php checked($instance['show_dropdown'], true) ?> id="<?php echo $this->get_field_id('show_dropdown'); ?>" name="<?php echo $this->get_field_name('show_dropdown'); ?>" />
+			<input class="checkbox" type="checkbox" <?php checked( (bool) $instance['show_dropdown'], true) ?> id="<?php echo $this->get_field_id('show_dropdown'); ?>" name="<?php echo $this->get_field_name('show_dropdown'); ?>" />
 			<label for="<?php echo $this->get_field_id('show_dropdown'); ?>"><?php _e('Show As Dropdown', 'mycategoryorder'); ?></label><br />
-			<input class="checkbox" type="checkbox" <?php checked($instance['show_last_updated'], true) ?> id="<?php echo $this->get_field_id('show_last_updated'); ?>" name="<?php echo $this->get_field_name('show_last_updated'); ?>" />
+			<input class="checkbox" type="checkbox" <?php checked( (bool) $instance['show_last_updated'], true) ?> id="<?php echo $this->get_field_id('show_last_updated'); ?>" name="<?php echo $this->get_field_name('show_last_updated'); ?>" />
 			<label for="<?php echo $this->get_field_id('show_last_updated'); ?>"><?php _e('Show Last Updated', 'mycategoryorder'); ?></label><br />
-			<input class="checkbox" type="checkbox" <?php checked($instance['show_count'], true) ?> id="<?php echo $this->get_field_id('show_count'); ?>" name="<?php echo $this->get_field_name('show_count'); ?>" />
+			<input class="checkbox" type="checkbox" <?php checked( (bool) $instance['show_count'], true) ?> id="<?php echo $this->get_field_id('show_count'); ?>" name="<?php echo $this->get_field_name('show_count'); ?>" />
 			<label for="<?php echo $this->get_field_id('show_count'); ?>"><?php _e('Show Count', 'mycategoryorder'); ?></label><br />
-			<input class="checkbox" type="checkbox" <?php checked($instance['hide_empty'], true) ?> id="<?php echo $this->get_field_id('hide_empty'); ?>" name="<?php echo $this->get_field_name('hide_empty'); ?>" />
+			<input class="checkbox" type="checkbox" <?php checked( (bool) $instance['hide_empty'], true) ?> id="<?php echo $this->get_field_id('hide_empty'); ?>" name="<?php echo $this->get_field_name('hide_empty'); ?>" />
 			<label for="<?php echo $this->get_field_id('hide_empty'); ?>"><?php _e('Hide Empty', 'mycategoryorder'); ?></label><br />
-			<input class="checkbox" type="checkbox" <?php checked($instance['use_desc_for_title'], true) ?> id="<?php echo $this->get_field_id('use_desc_for_title'); ?>" name="<?php echo $this->get_field_name('use_desc_for_title'); ?>" />
+			<input class="checkbox" type="checkbox" <?php checked( (bool) $instance['use_desc_for_title'], true) ?> id="<?php echo $this->get_field_id('use_desc_for_title'); ?>" name="<?php echo $this->get_field_name('use_desc_for_title'); ?>" />
 			<label for="<?php echo $this->get_field_id('use_desc_for_title'); ?>"><?php _e('Use Desc as Title', 'mycategoryorder'); ?></label><br />
-			<input class="checkbox" type="checkbox" <?php checked($instance['hierarchical'], true) ?> id="<?php echo $this->get_field_id('hierarchical'); ?>" name="<?php echo $this->get_field_name('hierarchical'); ?>" />
+			<input class="checkbox" type="checkbox" <?php checked( (bool) $instance['hierarchical'], true) ?> id="<?php echo $this->get_field_id('hierarchical'); ?>" name="<?php echo $this->get_field_name('hierarchical'); ?>" />
 			<label for="<?php echo $this->get_field_id('hierarchical'); ?>"><?php _e('Show Hierarchical', 'mycategoryorder'); ?></label><br />
 		</p>
 <?php
