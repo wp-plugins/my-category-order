@@ -3,8 +3,8 @@ Contributors: froman118
 Donate link: http://geekyweekly.com/gifts-and-donations
 Tags: categories, category, order, sidebar, widget
 Requires at least: 2.8
-Tested up to: 3.3.1
-Stable tag: 3.3.1
+Tested up to: 3.3.2
+Stable tag: 3.3.2
 
 My Category Order allows you to set the order in which categories will appear in the sidebar.
 
