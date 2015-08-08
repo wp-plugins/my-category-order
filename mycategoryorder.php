@@ -3,7 +3,7 @@
 Plugin Name: My Category Order
 Plugin URI: http://www.geekyweekly.com/mycategoryorder
 Description: My Category Order allows you to set the order in which categories will appear in the sidebar. Uses a drag and drop interface for ordering. Adds a widget with additional options for easy installation on widgetized themes.
-Version: 3.3.2
+Version: 4.3
 Author: Andrew Charlton
 Author URI: http://www.geekyweekly.com
 Author Email: froman118@gmail.com
@@ -255,9 +255,9 @@ function mycategoryorder_loadtranslation() {
 
 class mycategoryorder_Widget extends WP_Widget {
 
-	function mycategoryorder_Widget() {
+	function __construct() {
 		$widget_ops = array('classname' => 'widget_mycategoryorder', 'description' => __( 'Enhanced Category widget provided by My Category Order') );
-		$this->WP_Widget('mycategoryorder', __('My Category Order'), $widget_ops);	}
+		parent::__construct('mycategoryorder', __('My Category Order'), $widget_ops);	}
 
 	function widget( $args, $instance ) {
 		extract( $args );
